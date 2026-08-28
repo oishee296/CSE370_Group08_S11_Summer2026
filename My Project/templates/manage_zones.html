@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disaster Zone Tracking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1><a href="/home">Disaster Relief System</a></h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/home">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main style="flex-direction: column; align-items: center; padding-top: 40px; padding-bottom: 50px;">
+        
+        <!-- Form to Add a New Disaster Zone -->
+        <div class="login_box" style="max-width: 600px; margin-bottom: 40px; width: 100%;">
+            <h1>Declare Disaster Zone</h1>
+            <form class="login_form" method="POST" action="/add_zone">
+                <input type="text" name="name" placeholder="Disaster Name (e.g. Flash Flood)" required>
+                <input type="text" name="location" placeholder="Location (e.g. Sylhet)" required>
+                
+                <label for="severity" style="font-size: 0.85rem; color: #555; margin-bottom: 8px;">Severity Level</label>
+                <select name="severity" style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;" required>
+                    <option value="10">10 - Critical / Immediate Evacuation</option>
+                    <option value="7">7 - High / Major Relief Needed</option>
+                    <option value="4">4 - Moderate / Local Support</option>
+                    <option value="1">1 - Low / Monitoring</option>
+                </select>
+
+                <input type="text" name="warehouseID" placeholder="Assign Source Warehouse ID (e.g. WID001)" required>
+                
+                <input type="submit" value="Add Disaster Zone">
+            </form>
+        </div>
+
+        <!-- Table to Monitor and Update Zones -->
+        <div class="table_container">
+            <h1>Active Disaster Zones & Shipments</h1>
+            <p style="text-align: center; margin-bottom: 30px; color: #777;">Update status to 'Dispatched' to automatically track shipment timestamps.</p>
+            
+            <table class="data_table">
+                <thead>
+                    <tr>
+                        <th>Zone ID</th>
+                        <th>Disaster Name</th>
+                        <th>Location</th>
+                        <th>Severity</th>
+                        <th>Warehouse</th>
+                        <th>Last Updated / Dispatched</th>
+                        <th>Status Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for zone in zones %}
+                    <tr>
+                        <td>{{ zone.ZoneId }}</td>
+                        <td><strong>{{ zone.name }}</strong></td>
+                        <td>{{ zone.location }}</td>
+                        <td>
+                            {% if zone.severity >= 8 %}
+                                <span style="color: red; font-weight: bold;">{{ zone.severity }}</span>
+                            {% else %}
+                                {{ zone.severity }}
+                            {% endif %}
+                        </td>
+                        <td>{{ zone.warehouseID }}</td>
+                        <td style="font-size: 0.8rem;">{{ zone.dispatchTimeStamp }}</td>
+                        <td>
+                            <form method="POST" action="/update_zone/{{ zone.ZoneId }}" style="display: flex; gap: 5px;">
+                                <select name="status" style="padding: 5px; font-family: 'Montserrat';">
+                                    <option value="Pending" {% if zone.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                    <option value="Dispatched" {% if zone.status == 'Dispatched' %}selected{% endif %}>Dispatched</option>
+                                    <option value="Delivered" {% if zone.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                    <option value="Resolved" {% if zone.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                </select>
+                                <button type="submit" style="padding: 5px 10px; background-color: #1a1a1a; color: white; border: none; cursor: pointer;">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

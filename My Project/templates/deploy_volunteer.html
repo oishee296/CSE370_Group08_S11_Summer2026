@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deploy Volunteers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1>Deployment Dispatch Center</h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/volunteer_monitoring">Back to Monitoring</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main style="padding: 20px; max-width: 800px; margin: 0 auto;">
+        <div class="login_box" style="max-width: 100%; width: 100%;">
+            <h2>Assign Personnel to Field Operations</h2>
+            <p style="margin-bottom: 25px;">Select an active emergency destination zone and define the operational duties for the selected field assets.</p>
+
+            <form action="/process_deployment" method="POST">
+                <div style="margin-bottom: 20px;">
+                    <label for="volunteer_id" style="display: block; margin-bottom: 8px; font-weight: bold;">Selected Field Volunteer</label>
+                    <select name="volunteer_id" id="volunteer_id" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" onchange="window.location.href='/deploy_volunteer?volunteer_id=' + this.value">
+                        <option value="">-- Choose an Available Volunteer --</option>
+                        {% for vol in volunteers %}
+                            <option value="{{ vol.VolunteerID }}" {% if vol.VolunteerID == selected_id %}selected{% endif %}>
+                                {{ vol.FullName }} (Specialty: {{ vol.specialty }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label for="zone_id" style="display: block; margin-bottom: 8px; font-weight: bold;">Target Disaster Crisis Zone</label>
+                    <select name="zone_id" id="zone_id" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="">-- Choose an Active Disaster Zone --</option>
+                        {% for zone in zones %}
+                            <option value="{{ zone.ZoneId }}">{{ zone.name }} - {{ zone.location }} (Severity Level: {{ zone.severity }}/10)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <label for="role" style="display: block; margin-bottom: 8px; font-weight: bold;">Assigned Field Operations Role</label>
+                    <select name="role" id="role" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="">-- Select Deployment Core Responsibility --</option>
+                        {% if primary_specialty %}
+                            <option value="{{ primary_specialty }}" selected>Primary Specialty: {{ primary_specialty }}</option>
+                        {% endif %}
+                        <option value="General Field Rescue">General Field Rescue</option>
+                        <option value="Logistics Support">Logistics Support</option>
+                        <option value="Emergency Driver">Emergency Driver</option>
+                        <option value="First Aid Relief">First Aid Relief</option>
+                        <option value="Camp Security Coordinator">Camp Security Coordinator</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-link" style="border: none; width: 100%; cursor: pointer; text-align: center; display: block;">Authorize & Execute Deployment</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

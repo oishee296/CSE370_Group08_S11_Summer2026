@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volunteer Monitoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1>Volunteer Monitoring Panel</h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/home">Dashboard</a></li>
+                <li><a href="/active_deployments" style="background-color: #17a2b8; color: white; padding: 5px 10px; border-radius: 4px; margin-right: 5px;">Active Deployments</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <div class="login_box" style="max-width: 100%; width: 100%;">
+            <h2>Personnel & Contribution Ledger</h2>
+            <p style="margin-bottom: 20px;">Review application profiles, authorize incoming workforce additions, or execute personnel database adjustments.</p>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f4f4f4; border-bottom: 2px solid #ccc;">
+                        <th style="padding: 12px;">ID</th>
+                        <th style="padding: 12px;">Username</th>
+                        <th style="padding: 12px;">Full Name</th>
+                        <th style="padding: 12px;">Specialty</th>
+                        <th style="padding: 12px;">Status</th>
+                        <th style="padding: 12px;">Total Hours</th>
+                        <th style="padding: 12px; text-align: center;">Management Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for volunteer in volunteers %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 12px;">{{ volunteer.VolunteerID }}</td>
+                        <td style="padding: 12px;">{{ volunteer.Username }}</td>
+                        <td style="padding: 12px;">{{ volunteer.FullName }}</td>
+                        <td style="padding: 12px;">{{ volunteer.specialty }}</td>
+                        <td style="padding: 12px;">
+                            <span style="padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 0.85rem;
+                                {% if volunteer.AvailabilityStatus == 'Available' %} background-color: #d4edda; color: #155724;
+                                {% elif volunteer.AvailabilityStatus == 'Deployed' %} background-color: #cce5ff; color: #004085;
+                                {% else %} background-color: #fff3cd; color: #856404; {% endif %}">
+                                {{ volunteer.AvailabilityStatus }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px;">{{ volunteer.total_hours }} hrs</td>
+                        <td style="padding: 12px; display: flex; gap: 10px; justify-content: center; align-items: center;">
+                            {% if volunteer.AvailabilityStatus == 'Pending' %}
+                            <form action="{{ url_for('approve_volunteer', volunteer_id=volunteer.VolunteerID) }}" method="POST" style="margin: 0;">
+                                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Approve</button>
+                            </form>
+                            {% endif %}
+                            
+                            {% if volunteer.AvailabilityStatus == 'Available' %}
+                            <a href="/deploy_volunteer?volunteer_id={{ volunteer.VolunteerID }}" style="background-color: #007BFF; color: white; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 0.9rem; text-align: center;">Deploy</a>
+                            {% endif %}
+                            
+                            <form action="{{ url_for('remove_volunteer', volunteer_id=volunteer.VolunteerID) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to remove this volunteer?');">
+                                <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="padding: 20px; text-align: center; color: #666;">No volunteer records found in the system ledger.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

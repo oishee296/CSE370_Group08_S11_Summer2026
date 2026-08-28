@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Inventory Item</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <main>
+        <div class="table_container">
+            <h1>Edit Inventory Item</h1>
+
+            <form method="POST">
+
+                <label>Item Name</label>
+                <input type="text" name="item_name"
+                       value="{{ item.ItemName }}" required>
+
+                <br><br>
+
+                <label>Category</label>
+                <input type="text" name="category"
+                       value="{{ item.Category }}" required>
+
+                <br><br>
+
+                <label>Quantity</label>
+                <input type="number" name="quantity"
+                       value="{{ item.Quantity }}" min="0" required>
+
+                <br><br>
+
+                <label>Expiration Date</label>
+                <input type="date" name="expiration_date"
+                       value="{{ item.ExpirationDate }}" required>
+
+                <br><br>
+
+                <button type="submit">Save Changes</button>
+
+            </form>
+
+            <br>
+            <a href="/expiry_auditor">Cancel</a>
+        </div>
+    </main>
+</body>
+</html>

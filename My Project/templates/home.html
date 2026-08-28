@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disaster Relief Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1>Welcome, {{ name }}! <span style="font-size: 1rem; font-style: normal; font-weight: 400; color: #9c826b;">({{ role }})</span></h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="login_box" style="max-width: 600px;">
+            <h1>Disaster Management Relief System Active</h1>
+            {% if role == 'Admin' %}
+                <p style="margin-bottom: 30px;">Administrative management suite. Use the utilities below to audit inventory lifespans and schedule workforce deployments.</p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <a href="/expiry_auditor" class="btn-link">Run Expiry Date Auditor</a>
+                    <a href="/volunteer_monitoring" class="btn-link">Monitor Volunteer Contributions</a>
+                    <a href="/manage_zones" class="btn-link">Disaster Zone & Shipment Tracking</a>
+                    <a href="/add_inventory_item" class="btn-link">Add Inventory Item</a>
+                </div>
+            {% elif role == 'Volunteer' %}
+                <p style="margin-bottom: 20px;">Your volunteer dashboard session is active. You can now view assignment dispatches and review emergency operational statuses.</p>
+                
+                {% if volunteer_status == 'Deployed' and assignment %}
+                <div style="margin-bottom: 25px; padding: 20px; border-left: 5px solid #007BFF; background-color: #f1f7ff; text-align: left; border-radius: 4px;">
+                    <h3 style="margin-top: 0; color: #004085;">🚨 Active Mission Dispatch Order</h3>
+                    <p style="margin: 5px 0;"><strong>Crisis Zone:</strong> {{ assignment.zone_name }}</p>
+                    <p style="margin: 5px 0;"><strong>Location:</strong> {{ assignment.location }}</p>
+                    <p style="margin: 5px 0;"><strong>Severity Level:</strong> {{ assignment.severity }}/10</p>
+                    <p style="margin: 5px 0;"><strong>Your Assigned Field Role:</strong> <span style="background-color: #007BFF; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.9rem;">{{ assignment.current_role }}</span></p>
+                    <p style="margin: 5px 0; font-size: 0.85rem; color: #555; margin-top: 10px;">🕒 Deployed on: {{ assignment.deployed_at }}</p>
+                </div>
+                {% endif %}
+
+                <div style="padding: 15px; border: 1px solid #ccc; border-radius: 4px; background-color: #fafafa; text-align: left;">
+                    <h3 style="margin-top: 0;">Availability Settings</h3>
+                    <p style="margin-bottom: 15px;">Current Duty Status: 
+                        <strong style="{% if volunteer_status == 'Available' %}color: #28a745;{% elif volunteer_status == 'Deployed' %}color: #007BFF;{% else %}color: #dc3545;{% endif %}">
+                            {{ volunteer_status }}
+                        </strong>
+                    </p>
+                    {% if volunteer_status != 'Deployed' and volunteer_status != 'Pending' %}
+                        <form action="/volunteer/toggle_availability" method="POST">
+                            <input type="hidden" name="current_status" value="{{ volunteer_status }}">
+                            <button type="submit" class="btn-link" style="border: none; width: 100%; cursor: pointer; text-align: center; display: block; {% if volunteer_status == 'Available' %}background-color: #dc3545; color: white;{% else %}background-color: #28a745; color: white;{% endif %}">
+                                Go {% if volunteer_status == 'Available' %}Unavailable{% else %}Available{% endif %}
+                            </button>
+                        </form>
+                    {% elif volunteer_status == 'Deployed' %}
+                        <p style="font-size: 0.85rem; color: #666; font-style: italic; margin: 0;">Status transitions are locked while active deployment operations are running on your profile ledger.</p>
+                    {% elif volunteer_status == 'Pending' %}
+                        <p style="font-size: 0.85rem; color: #856404; font-style: italic; margin: 0;">Your sign-up record is awaiting administrative approval clearance before controls unlock.</p>
+                    {% endif %}
+                </div>
+
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

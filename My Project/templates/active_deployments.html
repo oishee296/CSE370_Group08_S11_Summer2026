@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Active Deployments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1>Active Field Deployments</h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/volunteer_monitoring">Volunteer Ledger</a></li>
+                <li><a href="/home">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <div class="login_box" style="max-width: 100%; width: 100%;">
+            <h2>Current Mission Workloads</h2>
+            <p style="margin-bottom: 20px;">Review live deployments below. Clicking release will automatically calculate runtime hours based on system clock durations.</p>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; text-align: left;">
+                <thead>
+                    <tr style="background-color: #f4f4f4; border-bottom: 2px solid #ccc;">
+                        <th style="padding: 12px;">Volunteer</th>
+                        <th style="padding: 12px;">Disaster Zone</th>
+                        <th style="padding: 12px;">Location</th>
+                        <th style="padding: 12px;">Assigned Role</th>
+                        <th style="padding: 12px;">Deployment Start Time</th>
+                        <th style="padding: 12px; text-align: center;">Operational Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dep in deployments %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 12px; font-weight: bold;">{{ dep.FullName }}</td>
+                        <td style="padding: 12px;">{{ dep.zone_name }}</td>
+                        <td style="padding: 12px;">{{ dep.location }}</td>
+                        <td style="padding: 12px;">{{ dep.current_role }}</td>
+                        <td style="padding: 12px;">{{ dep.deployed_at }}</td>
+                        <td style="padding: 12px; text-align: center;">
+                            <form action="/release_volunteer/{{ dep.VolunteerID }}/{{ dep.ZoneId }}" method="POST" style="margin: 0;">
+                                <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 6px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">End Mission & Release</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="padding: 20px; text-align: center; color: #666;">No active field assignments are currently running.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

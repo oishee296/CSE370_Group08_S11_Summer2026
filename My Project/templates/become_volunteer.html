@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register as Volunteer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1><a href="/home">Disaster Relief System</a></h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/home">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="login_box" style="max-width: 500px;">
+            <h1>Volunteer Registry</h1>
+            
+            {% if success %}
+            <div style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 15px; margin-bottom: 25px; border-radius: 4px; text-align: center; font-family: 'Montserrat', sans-serif; font-size: 0.95rem; line-height: 1.5;">
+                <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 1.1rem;">Application Submitted!</h3>
+                <p style="margin: 0 0 10px 0;">Your volunteer registration is currently <strong>waiting for admin approval</strong>.</p>
+                <a href="/home" style="color: #856404; font-weight: bold; text-decoration: underline;">Return to Dashboard</a>
+            </div>
+            {% else %}
+            <form class="login_form" method="POST" action="/become_volunteer">
+                <input type="text" name="full_name" placeholder="Full Name" required>
+                
+                <label for="volunteer_type" style="font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: #555; margin-bottom: 8px;">Volunteer Classification</label>
+                <select name="volunteer_type" id="volunteer_type" style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;" required>
+                    <option value="Field Support">Field Support</option>
+                    <option value="Medical Responder">Medical Responder</option>
+                    <option value="Logistics Coordinator">Logistics Coordinator</option>
+                </select>
+
+                <label for="specialty" style="font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: #555; margin-bottom: 8px;">General Specialty</label>
+                <select name="specialty" id="specialty" style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;" required>
+                    <option value="Search & Rescue">Search & Rescue</option>
+                    <option value="Disaster Shelter Mgmt">Disaster Shelter Management</option>
+                    <option value="Food & Supply Dist">Food & Supply Distribution</option>
+                    <option value="Community Outreach">Community Outreach</option>
+                </select>
+
+                <label for="cert_level" style="font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: #555; margin-bottom: 8px;">Certification Level</label>
+                <select name="cert_level" id="cert_level" style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;" required>
+                    <option value="Level 1 (Entry)">Level 1 (Entry)</option>
+                    <option value="Level 2 (Intermediate)">Level 2 (Intermediate)</option>
+                    <option value="Level 3 (Advanced/Lead)">Level 3 (Advanced/Lead)</option>
+                </select>
+
+                <label for="med_specialty" style="font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: #555; margin-bottom: 8px;">Medical Specialty</label>
+                <select name="med_specialty" id="med_specialty" style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;">
+                    <option value="">None (Non-Medical)</option>
+                    <option value="First Aid / CPR">First Aid / CPR</option>
+                    <option value="Emergency Nursing">Emergency Nursing</option>
+                    <option value="Paramedic / EMT">Paramedic / EMT</option>
+                    <option value="Trauma Surgery">Trauma Surgery</option>
+                </select>
+
+                <label for="license" style="font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: #555; margin-bottom: 8px;">Professional License Type</label>
+                <select name="license" id="license" style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;">
+                    <option value="">None / Not Applicable</option>
+                    <option value="State Driver License">State Driver License</option>
+                    <option value="Commercial (CDL) License">Commercial Truck License (CDL)</option>
+                    <option value="Registered Nurse (RN)">Registered Nurse (RN)</option>
+                    <option value="Certified EMT License">Certified EMT License</option>
+                </select>
+                
+                <input type="submit" value="Submit Verification">
+            </form>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>
