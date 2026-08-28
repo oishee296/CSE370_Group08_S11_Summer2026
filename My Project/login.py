@@ -642,7 +642,85 @@ def delete_warehouse(wid):
     return redirect(url_for('manage_warehouses'))
     
     
+#9.Assign Inventory item to a warehouse 
+@app.route('/assign_item/<int:wid>',methods=['GET','POST'])
+def assign_item(wid):
+   if 'username' not in session or session.get('role')!='Admin':
+        return redirect(url_for('login')) 
 
+   
+   conn = get_db_connection()
+   cursor = conn.cursor(dictionary=True)
+
+   if request.method =='POST':
+       item_id = request.form['item_id']
+       shelf_location = request.form['shelf_location']
+
+       cursor.execute(
+            """
+            INSERT INTO warehouse_contains_inventoryitems (ItemId,WID, shelf_location)
+            values (%s,%s,%s)
+            """,
+            (item_id,wid,shelf_location)
+        )
+       conn.commit()
+       cursor.close()
+       conn.close()
+       return redirect(url_for('manage_warehouses'))
+
+   ###ekhane we get all inv items for the dropdown
+   cursor.execute(
+       """
+       SELECT ItemId, ItemName
+       from InventoryItems 
+       ORDER by ItemName ASC
+       """
+   )
+   items = cursor.fetchall()
+
+   cursor.close()
+   conn.close()
+
+   return render_template('assign_item.html',wid=wid, items=items)
+
+#10.viewing warehouse inventories
+@app.route('/warehouse/<int:wid>/inventory')
+def warehouse_inventory(wid):
+    if 'username' not in session or session.get('role')!='Admin':
+        return redirect(url_for('login')) 
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT *FROM warehouses where WID=%s",
+        (wid,)
+    )
+    warehouse = cursor.fetchone()
+
+    #warehouse er bhitorer items pacchi
+    cursor.execute(
+        """
+        SELECT i.ItemId, i.ItemName, i.Category, i.Quantity,
+        i.ExpirationDate, wci.shelf_location
+        FROM warehouse_contains_inventoryitems wci
+        JOIN inventoryitems i ON wci.ItemId = i.ItemId
+        WHERE wci.WID = %s
+    """,(wid,)
+    )
+    items = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('warehouse_inventory.html',warehouse=warehouse,items=items)
+
+    
+
+
+
+   
+    
 
 
 

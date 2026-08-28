@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Inventory Item</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1><a href="/home">Disaster Relief System</a></h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/manage_warehouses">Warehouses</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="login_box">
+            <h1>Assign Item to Warehouse {{ wid }}</h1>
+
+            <form method="POST">
+
+                <label for="item_id">Inventory Item</label>
+                <select name="item_id" id="item_id" required>
+                    <option value="">-- Select an Item --</option>
+
+                    {% for item in items %}
+                    <option value="{{ item.ItemId }}">
+                        {{ item.ItemName }} (ID: {{ item.ItemId }})
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <br><br>
+
+                <label for="shelf_location">Shelf Location</label>
+                <input type="text"
+                       id="shelf_location"
+                       name="shelf_location"
+                       placeholder="Example: A-10"
+                       required>
+
+                <br><br>
+
+                <button type="submit">Assign Item</button>
+            </form>
+
+            <br>
+
+            <a href="/manage_warehouses">Cancel</a>
+        </div>
+    </main>
+</body>
+</html>

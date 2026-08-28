@@ -55,6 +55,8 @@
                         <td>{{ warehouse.Contact }}</td>
 
                         <td>
+                            <a href = "/assign_item/{{warehouse.WID}}">Assign Item</a>
+                            <a href="{{ url_for('warehouse_inventory', wid=warehouse.WID) }} ">View Inventory</a>
                             <a href="{{ url_for('edit_warehouse', wid=warehouse.WID) }}">
                                 Edit
                             </a>
