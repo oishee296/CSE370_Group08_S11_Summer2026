@@ -369,6 +369,7 @@ def update_zone(zone_id):
 # ----------------------------------------------------------------------------------
 
 #Oishee's Features
+##INVENTORY
 #1. add inventory
 @app.route('/add_inventory_item', methods=['GET', 'POST'])
 def add_inventory_item():
@@ -533,6 +534,118 @@ def update_stock(item_id):
     conn.close()
 
     return redirect(url_for('expiry_auditor'))
+
+#WAREHOUSE
+#5.manage warehouses ---- for viewing
+@app.route('/manage_warehouses')
+def manage_warehouses():
+    if 'username' not in session or session.get('role')!='Admin':
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor= conn.cursor(dictionary=True)
+
+    cursor.execute(
+        "SELECT *FROM Warehouses order by WID ASC"
+    )
+
+    warehouses = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template('manage_warehouses.html',warehouses=warehouses)
+
+#6.Register a warehouse
+@app.route('/add_warehouse', methods=['GET','POST'])
+def add_warehouse():
+    if 'username' not in session or session.get('role')!='Admin':
+        return redirect(url_for('login'))
+    
+    if request.method== 'POST':
+        manager = request.form['manager']
+        capacity = request.form['capacity']
+        contact = request.form['contact']
+
+        conn = get_db_connection()
+        cursor= conn.cursor()
+
+        cursor.execute(
+            """INSERT INTO Warehouses (Manager,Capacity,Contact)
+                values (%s,%s,%s)
+            """,(manager,capacity,contact)
+        )
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return redirect(url_for('manage_warehouses'))
+    
+    return render_template('add_warehouse.html')
+
+#7.Edit Warehouse
+@app.route('/edit_warehouse/<int:wid>',methods= ['GET','POST'])
+def edit_warehouse(wid):
+    if 'username' not in session or session.get('role')!='Admin':
+      return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        manager = request.form['manager']
+        capacity = request.form['capacity']
+        contact = request.form['contact']
+
+        cursor.execute(
+            """
+            UPDATE Warehouses
+            set Manager=%s, Capacity= %s, Contact= %s
+            where WID = %s
+            """,(manager,capacity,contact,wid)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return redirect(url_for('manage_warehouses'))
+
+    cursor.execute(
+        "SELECT *FROM Warehouses where WID= %s",
+        (wid,)
+    )
+    warehouse= cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('edit_warehouse.html',warehouse=warehouse)
+
+
+#8.Delete a warehouse
+@app.route('/delete_warehouse/<int:wid>',methods= ['POST'])
+def delete_warehouse(wid):
+    if 'username' not in session or session.get('role')!='Admin':
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute(
+        "DELETE from Warehouses where WID=%s",
+        (wid,)
+    )
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return redirect(url_for('manage_warehouses'))
+    
+    
+
+
+
+
 
 #------------------------------------------------
 
