@@ -230,3 +230,89 @@ main {
   background-color: #fdf2f2;
   color: #de3535;
 }
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+
+.btn-assign {
+    background: #e3eee7;
+    color: #5de993;
+}
+
+
+.btn-view {
+    background: #e3ebf3;
+    color: #5ea1ea;
+}
+
+
+.btn-edit {
+    background: #f5ecd9;
+    color: #f2b05b;
+}
+
+
+.btn-delete {
+    background: #f3e2e2;
+    color: #ef6b6b;
+}
+
+
+
+.stock-actions {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.stock-input {
+    width: 70px;
+}
+
+
+.btn {
+    display: inline-block;
+    padding: 7px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-add {
+    background: #f4d7f7;
+    color: #a00aad;
+}
+
+.btn-remove {
+    background: #c7e8f0;
+    color: #1070bf;
+}
+
+.btn-delete {
+    background: #ebc8a4;
+    color: #c35d14;
+}
+
+.btn-edit {
+    background: #ece694;
+    color: #9a8b05;
+}
