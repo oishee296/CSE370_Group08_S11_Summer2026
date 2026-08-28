@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 28, 2026 at 04:52 PM
+-- Generation Time: Aug 28, 2026 at 06:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -122,10 +122,11 @@ CREATE TABLE `inventoryitems` (
 --
 
 INSERT INTO `inventoryitems` (`ItemId`, `ExpirationDate`, `Quantity`, `Category`, `ItemName`) VALUES
-(0, '2027-12-05', 10, 'grains(kg)', 'brown rice'),
-(0, '2028-12-09', 20, 'dry', 'biscuits'),
-(0, '2026-09-02', 2, 'fruit', 'apples'),
-(0, '2026-08-20', 5, 'liquid', 'milk');
+(1, '2027-12-05', 0, 'grains(kg)', 'brown rice'),
+(2, '2026-09-10', 23, 'dry', 'cookies'),
+(3, '2026-09-02', 10, 'fruit', 'apples'),
+(4, '2026-08-20', 15, 'liquid', 'milk'),
+(6, '2033-06-14', 5, '?', 'candles');
 
 -- --------------------------------------------------------
 
@@ -227,10 +228,50 @@ CREATE TABLE `warehouse_contains_inventoryitems` (
 --
 
 --
+-- Indexes for table `disasterzones`
+--
+ALTER TABLE `disasterzones`
+  ADD PRIMARY KEY (`ZoneId`);
+
+--
+-- Indexes for table `inventoryitems`
+--
+ALTER TABLE `inventoryitems`
+  ADD PRIMARY KEY (`ItemId`);
+
+--
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`username`);
+
+--
+-- Indexes for table `warehouses`
+--
+ALTER TABLE `warehouses`
+  ADD PRIMARY KEY (`WID`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `disasterzones`
+--
+ALTER TABLE `disasterzones`
+  MODIFY `ZoneId` int(15) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `inventoryitems`
+--
+ALTER TABLE `inventoryitems`
+  MODIFY `ItemId` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `warehouses`
+--
+ALTER TABLE `warehouses`
+  MODIFY `WID` int(15) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
