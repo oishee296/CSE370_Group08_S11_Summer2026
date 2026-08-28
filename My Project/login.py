@@ -466,7 +466,7 @@ def delete_inventory_item(item_id):
 
     return redirect(url_for('expiry_auditor'))
         
-#4 expiry_auditor
+#4. expiry_auditor -- ++restock alert
 
 @app.route('/expiry_auditor')
 def expiry_auditor():
@@ -484,7 +484,7 @@ def expiry_auditor():
                    ELSE 'Stock Available :)'
                 END AS RestockStatus
         FROM InventoryItems
-        ORDER BY ExpirationDate ASC
+        ORDER BY ItemId ASC,ExpirationDate ASC
     """
     cursor.execute(sql)
     items = cursor.fetchall()
@@ -492,6 +492,47 @@ def expiry_auditor():
     cursor.close()
     conn.close()
     return render_template('expiry_auditor.html', items=items)
+
+#5.update stock
+@app.route('/update_stock/<int:item_id>',methods=['POST'])
+def update_stock(item_id):
+    if 'username' not in session or session.get('role')!= 'Admin':
+        return redirect(url_for('login'))
+
+    amount = int(request.form['amount'])
+    action = request.form['action']
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True,buffered=True)
+
+    #current quantity pacchi ekhane
+    cursor.execute(
+        "SELECT Quantity FROM InventoryItems WHERE ItemId = %s",
+        (item_id,)
+    )
+    item = cursor.fetchone()
+
+    if item:
+        current_quantity = item['Quantity']
+
+        if action== 'add':
+            new_quantity = current_quantity + amount
+        elif action== 'remove':
+            new_quantity = current_quantity - amount
+
+            if new_quantity<0 :
+                new_quantity = 0
+        else:
+            new_quantity = current_quantity
+        cursor.execute(
+            "UPDATE InventoryItems SET Quantity =%s WHERE ItemId = %s",
+            (new_quantity,item_id)
+        )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return redirect(url_for('expiry_auditor'))
 
 #------------------------------------------------
 

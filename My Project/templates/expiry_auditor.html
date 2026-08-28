@@ -37,6 +37,7 @@
                         <th>Restock Status</th>
                         <th>Expiration Date</th>
                         <th>Status / Days Left</th>
+                        <th>Update Stock</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -58,7 +59,7 @@
                                 Stock Available 
 
                              </span>
-                            { %endif %}
+                            {% endif %}
 
                         </td>
                         <td>{{ item.ExpirationDate }}</td>
@@ -79,6 +80,29 @@
                                     {{ item.days_remaining }} days remaining
                                 </span>
                             {% endif %}
+                        </td>
+
+                        <!-- Update Stock -->
+                        <td>
+                            <form action="{{ url_for('update_stock', item_id=item.ItemId) }}"
+                                 method="POST"
+                                 style="display: flex; gap: 5px; align-items: center;">
+
+                                <input type="number"
+                                     name="amount"
+                                     min="1"
+                                     placeholder="Amount"
+                                      required
+                                     style="width: 70px;">
+
+                                <button type="submit" name="action" value="add">
+                                 + Add
+                             </button>
+
+                             <button type="submit" name="action" value="remove">
+                                   − Remove
+                             </button>
+                             </form>
                         </td>
 
                         <!-- Edit and Delete buttons -->
