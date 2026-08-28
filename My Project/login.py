@@ -478,7 +478,11 @@ def expiry_auditor():
     
     sql = """
         SELECT ItemId, ItemName, ExpirationDate, Quantity, Category,
-               DATEDIFF(ExpirationDate, CURDATE()) AS days_remaining
+               DATEDIFF(ExpirationDate, CURDATE()) AS days_remaining,
+               CASE
+                   WHEN Quantity<=10 THEN '!!RESTOCK NEEDED!!'
+                   ELSE 'Stock Available :)'
+                END AS RestockStatus
         FROM InventoryItems
         ORDER BY ExpirationDate ASC
     """

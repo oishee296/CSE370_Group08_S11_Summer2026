@@ -34,6 +34,7 @@
                         <th>Item Name</th>
                         <th>Category</th>
                         <th>Quantity</th>
+                        <th>Restock Status</th>
                         <th>Expiration Date</th>
                         <th>Status / Days Left</th>
                         <th>Actions</th>
@@ -47,6 +48,19 @@
                         <td><strong>{{ item.ItemName }}</strong></td>
                         <td>{{ item.Category }}</td>
                         <td>{{ item.Quantity }}</td>
+                        <td>
+                            {%if item.RestockStatus == '!!RESTOCK NEEDED!!'%}
+                             <span class= "badge badge-urgent">
+                                    !!RESTOCK NEEDED!!
+                             </span>
+                            {%else%}
+                             <span class= "badge badge-safe">
+                                Stock Available 
+
+                             </span>
+                            { %endif %}
+
+                        </td>
                         <td>{{ item.ExpirationDate }}</td>
 
                         <td>
