@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Warehouse</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1><a href="/home">Disaster Relief System</a></h1>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="login_box">
+            <h1>Register Warehouse</h1>
+
+            <form method="POST">
+
+                <label for="manager">Manager</label>
+                <input type="text" id="manager" name="manager" required>
+
+                <br><br>
+
+                <label for="capacity">Capacity</label>
+                <input type="number" id="capacity" name="capacity"
+                       min="1" required>
+
+                <br><br>
+
+                <label for="contact">Contact</label>
+                <input type="number" id="contact" name="contact" required>
+
+                <br><br>
+
+                <button type="submit">Register Warehouse</button>
+
+            </form>
+
+            <br>
+
+            <a href="{{ url_for('manage_warehouses') }}">
+                Back to Warehouses
+            </a>
+        </div>
+    </main>
+</body>
+</html>
