@@ -26,21 +26,26 @@
                     <a href="/volunteer_monitoring" class="btn-link">Monitor Volunteer Contributions</a>
                     <a href="/manage_zones" class="btn-link">Disaster Zone & Shipment Tracking</a>
                     <a href="/add_inventory_item" class="btn-link">Add Inventory Item</a>
-                    <a href="/manage_warehouses" class="btn-link">Manage Warehouses</a>
+					<a href="/zone_analytics" class="btn-link">View Live Disaster Zone Analytics Report </a>
+					<a href="/manage_warehouses" class="btn-link">Manage Warehouses</a>
                 </div>
             {% elif role == 'Volunteer' %}
                 <p style="margin-bottom: 20px;">Your volunteer dashboard session is active. You can now view assignment dispatches and review emergency operational statuses.</p>
                 
                 {% if volunteer_status == 'Deployed' and assignment %}
                 <div style="margin-bottom: 25px; padding: 20px; border-left: 5px solid #007BFF; background-color: #f1f7ff; text-align: left; border-radius: 4px;">
-                    <h3 style="margin-top: 0; color: #004085;">🚨 Active Mission Dispatch Order</h3>
+                    <h3 style="margin-top: 0; color: #004085;"> Active Mission Dispatch Order</h3>
                     <p style="margin: 5px 0;"><strong>Crisis Zone:</strong> {{ assignment.zone_name }}</p>
                     <p style="margin: 5px 0;"><strong>Location:</strong> {{ assignment.location }}</p>
                     <p style="margin: 5px 0;"><strong>Severity Level:</strong> {{ assignment.severity }}/10</p>
                     <p style="margin: 5px 0;"><strong>Your Assigned Field Role:</strong> <span style="background-color: #007BFF; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.9rem;">{{ assignment.current_role }}</span></p>
-                    <p style="margin: 5px 0; font-size: 0.85rem; color: #555; margin-top: 10px;">🕒 Deployed on: {{ assignment.deployed_at }}</p>
+                    <p style="margin: 5px 0; font-size: 0.85rem; color: #555; margin-top: 10px;"> Deployed on: {{ assignment.deployed_at }}</p>
                 </div>
                 {% endif %}
+
+                <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
+                    <a href="/view_disaster_zones" class="btn-link" style="text-align: center;">View Active Disaster Zones</a>
+                </div>
 
                 <div style="padding: 15px; border: 1px solid #ccc; border-radius: 4px; background-color: #fafafa; text-align: left;">
                     <h3 style="margin-top: 0;">Availability Settings</h3>
@@ -63,6 +68,12 @@
                     {% endif %}
                 </div>
 
+            {% else %}
+                <p style="margin-bottom: 25px;">Welcome to the relief portal. You can browse basic options or register with our emergency action networks to assist on the ground.</p>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <a href="/view_disaster_zones" class="btn-link" style="text-align: center;">View Active Disaster Zones</a>
+                    <a href="/become_volunteer" class="btn-link" style="text-align: center; font-weight: bold; background-color: #007BFF; color: white;">Apply to Become a Field Volunteer</a>
+                </div>
             {% endif %}
         </div>
     </main>

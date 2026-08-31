@@ -304,7 +304,29 @@ def toggle_availability():
         
     return redirect(url_for('home'))
 
+@app.route('/view_disaster_zones')
+def view_disaster_zones():
+    if 'username' not in session or session.get('role') not in ['Customer', 'Volunteer']:
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    sql = """
+        SELECT ZoneId, status, name, location, severity, warehouseID, dispatchTimeStamp 
+        FROM disasterzones 
+        ORDER BY severity DESC
+    """
+    cursor.execute(sql)
+    zones = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    return render_template('view_disaster_zones.html', zones=zones)
+
 #Aryan-----------------------------------------------------------------------
+
+#1. Disaster zone & shipment tracking
 @app.route('/manage_zones', methods=['GET'])
 def manage_zones():
     if 'username' not in session or session.get('role') != 'Admin':
@@ -313,12 +335,14 @@ def manage_zones():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
+    #based on severity highest one is shown
     cursor.execute("SELECT * FROM disasterzones ORDER BY severity DESC")
     zones = cursor.fetchall()
     
     cursor.close()
     conn.close()
     return render_template('manage_zones.html', zones=zones)
+
 
 @app.route('/add_zone', methods=['POST'])
 def add_zone():
@@ -334,20 +358,27 @@ def add_zone():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute("SELECT MAX(ZoneId) FROM disasterzones")
-    max_id = cursor.fetchone()[0]
-    new_id = 1 if max_id is None else max_id + 1
-    
-    sql = """INSERT INTO disasterzones (ZoneId, name, location, severity, warehouseID, status) 
-             VALUES (%s, %s, %s, %s, %s, %s)"""
-    cursor.execute(sql, (new_id, name, location, severity, warehouse_id, status))
-    conn.commit()
-    
-    cursor.close()
-    conn.close()
+    try:
+        cursor.execute("SELECT MAX(ZoneId) FROM disasterzones")
+        max_id = cursor.fetchone()[0]
+        new_id = 1 if max_id is None else max_id + 1
+        
+        sql = """
+            INSERT INTO disasterzones (ZoneId, name, location, severity, warehouseID, status) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (new_id, name, location, severity, warehouse_id, status))
+        conn.commit()
+    except Exception as err:
+        conn.rollback()
+        print(f"Error adding zone: {err}")
+    finally:
+        cursor.close()
+        conn.close()
     
     return redirect(url_for('manage_zones'))
     
+
 @app.route('/update_zone/<int:zone_id>', methods=['POST'])
 def update_zone(zone_id):
     if 'username' not in session or session.get('role') != 'Admin':
@@ -355,16 +386,134 @@ def update_zone(zone_id):
         
     new_status = request.form['status']
     
-    
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE disasterzones SET status = %s WHERE ZoneId = %s", (new_status, zone_id))
-    conn.commit()
     
-    cursor.close()
-    conn.close()
+    try:
+        cursor.execute("UPDATE disasterzones SET status = %s WHERE ZoneId = %s", (new_status, zone_id))
+        conn.commit()
+    except Exception as err:
+        conn.rollback()
+        print(f"Error updating zone status: {err}")
+    finally:
+        cursor.close()
+        conn.close()
     
     return redirect(url_for('manage_zones'))
+
+
+#2. dispatch shipment (resource allocation)
+@app.route('/dispatch_shipment/<int:zone_id>', methods=['GET', 'POST'])
+def dispatch_shipment(zone_id):
+    if 'username' not in session or session.get('role') != 'Admin':
+        return redirect(url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    if request.method == 'POST':
+        item_id = request.form['item_id']
+        dispatch_qty = int(request.form['quantity'])
+
+        try:
+            # check if enough stock exists first
+            cursor.execute("SELECT Quantity FROM inventoryitems WHERE ItemId = %s", (item_id,))
+            item_data = cursor.fetchone()
+            
+            if not item_data or item_data['Quantity'] < dispatch_qty:
+                return "Error: Insufficient stock for this dispatch."
+
+            # get the assigned warehouse ID for this zone
+            cursor.execute("SELECT warehouseID FROM disasterzones WHERE ZoneId = %s", (zone_id,))
+            zone_data = cursor.fetchone()
+            warehouse_id = zone_data['warehouseID'] if zone_data else 0
+
+            # deduct from inventory
+            update_sql = "UPDATE inventoryitems SET Quantity = Quantity - %s WHERE ItemId = %s"
+            cursor.execute(update_sql, (dispatch_qty, item_id))
+            
+            # log the shipment dispatch into our new table
+            log_sql = """
+                INSERT INTO shipmentlog (ItemId, ZoneId, WID, QuantityShipped, DispatchedBy, DispatchedAt) 
+                VALUES (%s, %s, %s, %s, %s, NOW())
+            """
+            cursor.execute(log_sql, (item_id, zone_id, warehouse_id, dispatch_qty, session['username']))
+            
+            # automatically update zone status to dispatched
+            cursor.execute(
+                "UPDATE disasterzones SET status = 'Dispatched', dispatchTimeStamp = NOW() WHERE ZoneId = %s", 
+                (zone_id,)
+            )
+            
+            conn.commit()
+            return redirect(url_for('manage_zones'))
+
+        except Exception as err:
+            conn.rollback()
+            return f"Transaction Failed: {err}"
+        finally:
+            cursor.close()
+            conn.close()
+            
+    # GET method - fetch inventory for the dropdown
+    try:
+        fetch_inventory_sql = """
+            SELECT i.ItemId, i.ItemName, i.Quantity, i.Category 
+            FROM inventoryitems i
+            JOIN warehouse_contains_inventoryitems wci ON i.ItemId = wci.ItemId
+            JOIN warehouses w ON w.WID = wci.WID
+            JOIN disasterzones dz ON dz.warehouseID = w.WID
+            WHERE dz.ZoneId = %s AND i.Quantity > 0
+        """
+        cursor.execute(fetch_inventory_sql, (zone_id,))
+        available_items = cursor.fetchall()
+        
+        cursor.execute("SELECT * FROM disasterzones WHERE ZoneId = %s", (zone_id,))
+        zone = cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return render_template('dispatch_shipment.html', items=available_items, zone=zone)
+
+#3. live disaster zone analytics & resource report
+@app.route('/zone_analytics')
+def zone_analytics():
+    if 'username' not in session or session.get('role') != 'Admin':
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Complex Aggregation Query calculating live stats per disaster zone
+        analytics_sql = """
+            SELECT 
+                dz.ZoneId, 
+                dz.name, 
+                dz.location,
+                dz.severity, 
+                dz.status,
+                COUNT(DISTINCT vd.VolunteerID) AS active_personnel,
+                COALESCE(SUM(TIMESTAMPDIFF(HOUR, vd.deployed_at, NOW())), 0) AS live_hours_contributed,
+                COALESCE(sl.total_shipped, 0) AS total_items_dispatched
+            FROM disasterzones dz
+            LEFT JOIN volunteers_deployedto_dzones vd ON dz.ZoneId = vd.ZoneId
+            LEFT JOIN (
+                SELECT ZoneId, SUM(QuantityShipped) AS total_shipped
+                FROM shipmentlog GROUP BY ZoneId
+            ) sl ON dz.ZoneId = sl.ZoneId
+            GROUP BY dz.ZoneId, dz.name, dz.location, dz.severity, dz.status, sl.total_shipped
+            ORDER BY dz.severity DESC, active_personnel DESC
+        """
+        cursor.execute(analytics_sql)
+        analytics = cursor.fetchall()
+
+    finally:
+        cursor.close()
+        conn.close()
+    
+    return render_template('zone_analytics.html', analytics=analytics)
 
 # ----------------------------------------------------------------------------------
 
@@ -729,35 +878,33 @@ def warehouse_inventory(wid):
 
 
 
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        role_choice = request.form['role']
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
         try:
-            sql = "INSERT INTO User (username, password, regDate, isActive) VALUES (%s, %s, NOW(), 1)"
+            sql = "INSERT INTO user (username, password, regDate, isActive) VALUES (%s, %s, NOW(), 1)"
             cursor.execute(sql, (username, password))
             
-            if role_choice == 'Admin':
-                cursor.execute("INSERT INTO Admin (Username, dept, accessLevel) VALUES (%s, 'General Relief', 'Standard')", (username,))
-            else:
-                cursor.execute("INSERT INTO Customer (Username) VALUES (%s)", (username,))
+            cursor.execute("INSERT INTO customer (Username) VALUES (%s)", (username,))
                 
             conn.commit()
             return "Registration successful! <a href='/login'>Click here to login</a>"
         except Exception as err:
             conn.rollback()
-            return f"Error: Could not register user. Username might already exist. Details: {err}"
+            return f"Error: Could not register user. Details: {err}"
         finally:
             cursor.close()
             conn.close()
             
     return render_template('signup.html')
+
 
 
 @app.route('/home')
@@ -766,20 +913,19 @@ def home():
         return redirect(url_for('login'))
         
     username = session['username']
-    role = session.get('role')
     v_status = None
     my_deployment = None
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
-    cursor.execute("SELECT * FROM Admin WHERE Username = %s", (username,))
+    cursor.execute("SELECT * FROM admin WHERE Username = %s", (username,))
     is_admin = cursor.fetchone()
     
     if is_admin:
         session['role'] = 'Admin'
     else:
-        cursor.execute("SELECT VolunteerID, AvailabilityStatus FROM Volunteers WHERE Username = %s", (username,))
+        cursor.execute("SELECT VolunteerID, AvailabilityStatus FROM volunteers WHERE Username = %s", (username,))
         volunteer_record = cursor.fetchone()
         if volunteer_record:
             session['role'] = 'Volunteer'
@@ -795,7 +941,7 @@ def home():
                 cursor.execute(sql_dep, (volunteer_record['VolunteerID'],))
                 my_deployment = cursor.fetchone()
         else:
-            cursor.execute("SELECT * FROM Customer WHERE Username = %s", (username,))
+            cursor.execute("SELECT * FROM customer WHERE Username = %s", (username,))
             if cursor.fetchone():
                 session['role'] = 'Customer'
             else:
@@ -805,6 +951,7 @@ def home():
     conn.close()
     
     return render_template('home.html', name=username, role=session.get('role'), volunteer_status=v_status, assignment=my_deployment)
+
 
 @app.route('/logout')
 def logout():

@@ -35,7 +35,7 @@
                     <option value="1">1 - Low / Monitoring</option>
                 </select>
 
-                <input type="text" name="warehouseID" placeholder="Assign Source Warehouse ID (e.g. WID001)" required>
+                <input type="text" name="warehouseID" placeholder="Assign Source Warehouse ID (e.g. 1)" required>
                 
                 <input type="submit" value="Add Disaster Zone">
             </form>
@@ -74,7 +74,7 @@
                         <td>{{ zone.warehouseID }}</td>
                         <td style="font-size: 0.8rem;">{{ zone.dispatchTimeStamp }}</td>
                         <td>
-                            <form method="POST" action="/update_zone/{{ zone.ZoneId }}" style="display: flex; gap: 5px;">
+                            <form method="POST" action="/update_zone/{{ zone.ZoneId }}" style="display: flex; gap: 5px; margin-bottom: 8px;">
                                 <select name="status" style="padding: 5px; font-family: 'Montserrat';">
                                     <option value="Pending" {% if zone.status == 'Pending' %}selected{% endif %}>Pending</option>
                                     <option value="Dispatched" {% if zone.status == 'Dispatched' %}selected{% endif %}>Dispatched</option>
@@ -83,6 +83,9 @@
                                 </select>
                                 <button type="submit" style="padding: 5px 10px; background-color: #1a1a1a; color: white; border: none; cursor: pointer;">Update</button>
                             </form>
+                            
+                            <!-- YOUR NEW DISPATCH BUTTON -->
+                            <a href="/dispatch_shipment/{{ zone.ZoneId }}" style="display: block; text-align: center; padding: 6px; background-color: #28a745; color: white; text-decoration: none; border-radius: 3px; font-size: 0.85rem;">Dispatch Supplies</a>
                         </td>
                     </tr>
                     {% endfor %}

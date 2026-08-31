@@ -24,8 +24,8 @@
 
             <form action="/process_deployment" method="POST">
                 <div style="margin-bottom: 20px;">
-                    <label for="volunteer_id" style="display: block; margin-bottom: 8px; font-weight: bold;">Selected Field Volunteer</label>
-                    <select name="volunteer_id" id="volunteer_id" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" onchange="window.location.href='/deploy_volunteer?volunteer_id=' + this.value">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Selected Field Volunteer</label>
+                    <select name="volunteer_id" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" onchange="window.location.href='/deploy_volunteer?volunteer_id=' + this.value">
                         <option value="">-- Choose an Available Volunteer --</option>
                         {% for vol in volunteers %}
                             <option value="{{ vol.VolunteerID }}" {% if vol.VolunteerID == selected_id %}selected{% endif %}>
@@ -36,8 +36,8 @@
                 </div>
 
                 <div style="margin-bottom: 20px;">
-                    <label for="zone_id" style="display: block; margin-bottom: 8px; font-weight: bold;">Target Disaster Crisis Zone</label>
-                    <select name="zone_id" id="zone_id" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Target Disaster Crisis Zone</label>
+                    <select name="zone_id" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                         <option value="">-- Choose an Active Disaster Zone --</option>
                         {% for zone in zones %}
                             <option value="{{ zone.ZoneId }}">{{ zone.name }} - {{ zone.location }} (Severity Level: {{ zone.severity }}/10)</option>
@@ -46,8 +46,8 @@
                 </div>
 
                 <div style="margin-bottom: 30px;">
-                    <label for="role" style="display: block; margin-bottom: 8px; font-weight: bold;">Assigned Field Operations Role</label>
-                    <select name="role" id="role" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Assigned Field Operations Role</label>
+                    <select name="role" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
                         <option value="">-- Select Deployment Core Responsibility --</option>
                         {% if primary_specialty %}
                             <option value="{{ primary_specialty }}" selected>Primary Specialty: {{ primary_specialty }}</option>

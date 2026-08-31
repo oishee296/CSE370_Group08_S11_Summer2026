@@ -22,11 +22,7 @@
             <form class="login_form" method="POST" action="/signup">
                 <input type="text" name="username" placeholder="Choose Username" required>
                 <input type="password" name="password" placeholder="Choose Password" required>
-                <label for="role" style="font-family: 'Montserrat', sans-serif; font-size: 0.85rem; color: #555; margin-bottom: 8px;">Account Type</label>
-                <select name="role" id="role" style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;" required>
-                    <option value="Customer">Customer (General Public)</option>
-                    <option value="Admin">Administrator</option>
-                </select>
+                <input type="hidden" name="role" value="Customer">
                 <input type="submit" value="Register Account">
             </form>
         </div>

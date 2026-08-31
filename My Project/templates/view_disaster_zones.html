@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Disaster Zones</title>
+    <style>
+        body { background-color: #f8f9fa; }
+        .severity-high { background-color: #f8d7da; color: #842029; font-weight: bold; }
+        .severity-medium { background-color: #fff3cd; color: #664d03; font-weight: bold; }
+        .severity-low { background-color: #d1e7dd; color: #0f5132; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 text-dark">Active Disaster Management Zones</h1>
+                <p class="text-muted">Real-time tracking of active operations and deployment severity levels.</p>
+            </div>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">&larr; Back to Dashboard</a>
+        </div>
+
+        {% if zones %}
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Zone Name</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Severity Level</th>
+                            <th>Warehouse Ref</th>
+                            <th>Dispatched At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for zone in zones %}
+                        <tr>
+                            <td><strong>{{ zone.name }}</strong></td>
+                            <td>{{ zone.location }}</td>
+                            <td>
+                                <span class="badge {{ 'bg-danger' if zone.status == 'Active' else 'bg-warning text-dark' }}">
+                                    {{ zone.status }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge px-3 py-2 
+                                    {% if zone.severity >= 8 %} severity-high
+                                    {% elif zone.severity >= 5 %} severity-medium
+                                    {% else %} severity-low {% endif %}">
+                                    {{ zone.severity }} / 10
+                                </span>
+                            </td>
+                            <td><code class="text-secondary">WID-{{ zone.warehouseID }}</code></td>
+                            <td class="text-muted small">{{ zone.dispatchTimeStamp }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center py-5 shadow-sm" role="alert">
+            <h4 class="alert-heading">All Clear!</h4>
+            <p class="mb-0">There are currently no reported active disaster tracking zones in the database.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

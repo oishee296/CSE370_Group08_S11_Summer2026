@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zone Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1>Disaster Relief System</h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/home">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main style="padding-top: 40px; align-items: flex-start;">
+        <div class="table_container" style="max-width: 1200px;">
+            <h1>Live Disaster Zone Analytics</h1>
+            <p style="text-align: center; margin-bottom: 30px; color: #777;">Live resource and personnel effort report grouped by active zones.</p>
+
+            <table class="data_table">
+                <thead>
+                    <tr>
+                        <th>Zone ID</th>
+                        <th>Crisis Name</th>
+                        <th>Location</th>
+                        <th>Severity</th>
+                        <th>Current Status</th>
+                        <th>Active Volunteers Deployed</th>
+                        <th>Live Volunteer Hours Contributed</th>
+                        <th>Total Supplies Dispatched</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in analytics %}
+                    <tr>
+                        <td>{{ data.ZoneId }}</td>
+                        <td><strong>{{ data.name }}</strong></td>
+                        <td>{{ data.location }}</td>
+                        <td>
+                            {% if data.severity >= 8 %}
+                                <span class="badge badge-urgent">Level {{ data.severity }}</span>
+                            {% else %}
+                                <span class="badge badge-safe">Level {{ data.severity }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ data.status }}</td>
+                        <td style="font-weight: bold; font-size: 1.1rem; color: #007BFF;">{{ data.active_personnel }} Personnel</td>
+                        <td style="font-weight: bold; font-size: 1.1rem; color: #28a745;">{{ data.live_hours_contributed }} Hours</td>
+                        <td style="font-weight: bold; font-size: 1.1rem; color: #dc3545;">{{ data.total_items_dispatched }} Items</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

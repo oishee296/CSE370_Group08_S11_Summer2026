@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dispatch Shipment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav_logo">
+                <h1>Disaster Relief System</h1>
+            </div>
+            <ul class="nav_link">
+                <li><a href="/manage_zones">Back to Zones</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="login_box" style="max-width: 500px;">
+            <h1>Dispatch Supplies</h1>
+            <p style="text-align: center; margin-bottom: 20px;">
+                Sending supplies to <strong>{{ zone.name }}</strong> ({{ zone.location }}).<br>
+                Pulling from assigned Warehouse ID: {{ zone.warehouseID }}
+            </p>
+
+            <form method="POST" class="login_form">
+                <label style="font-size: 0.85rem; color: #555; margin-bottom: 8px;">Select Available Item</label>
+                <select name="item_id" required style="padding: 12px; margin-bottom: 28px; border: none; border-bottom: 1px solid #dcd6cd; font-family: 'Montserrat', sans-serif; background: transparent; outline: none;">
+                    <option value="">-- Select an Item --</option>
+                    {% for item in items %}
+                        <option value="{{ item.ItemId }}">{{ item.ItemName }} (Available: {{ item.Quantity }})</option>
+                    {% endfor %}
+                </select>
+
+                <label style="font-size: 0.85rem; color: #555; margin-bottom: 8px;">Dispatch Quantity</label>
+                <input type="number" name="quantity" min="1" placeholder="Enter amount to send" required>
+
+                <input type="submit" value="Authorize Shipment" style="background-color: #28a745; border: none; color: white; padding: 12px; cursor: pointer; font-weight: bold;">
+            </form>
+            
+            {% if not items %}
+                <p style="color: red; text-align: center; margin-top: 20px;">No inventory is currently assigned to this zone's warehouse, or stock is empty.</p>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>
