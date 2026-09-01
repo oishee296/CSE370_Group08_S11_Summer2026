@@ -586,7 +586,7 @@ def edit_inventory_item(item_id):
         cursor.close()
         conn.close()
 
-        return redirect(url_for('expiry_auditor')) #eta keno redirect hocche?
+        return redirect(url_for('expiry_auditor'))
     cursor.execute(
         "SELECT * FROM InventoryItems where ItemId =%s",
         (item_id,)
